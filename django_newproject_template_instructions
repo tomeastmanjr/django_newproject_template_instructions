@@ -1,0 +1,113 @@
+First, activate django
+    go to the virtualenv folder and type:
+        source djangoEnv/bin/activate
+
+Navigate to location where project should be
+    type: django-admin startproject <project_name>
+	cd <project_name>
+	mkdir apps
+	cd apps
+	touch __init__.py
+	python ../manage.py startapp <app_name>
+	cd ..
+	atom .   (or skip to steps below if you don’t use atom)
+
+******** BIG NOTE *******
+There can be errors when copying and pasting. I have run across errors with quotes being posted as non ascii characters. If you see an error like that, go to that line and look at the quotes and for odd looking characters, delete them and retype them.
+*****************
+********** ALSO********
+Make sure you change out all of the <app_name> generic tags in the code you paste in
+*******************
+
+
+In text editor:
+ Open <project_name>/<project_name>/settings.py
+ Under INSTALLED_APPS 
+	add 'apps.<app_name>' and ‘django_extensions’, to the list
+   **** don't forget the comma!!****
+
+Open <project_name>/<project_name>/urls.py
+    add include to import after url
+    change urlpatterns to url(r'^', include('apps.<app_name>.urls'))
+
+Create a "urls.py" file in ./apps/<app_name>/
+    copy the code from <project_name>/<project_name>/urls.py
+    This is where we redirect urls to particular files and should look something like this:
+        from django.conf.urls import url
+        from . import views                   #add this line
+        urlpatterns = [
+          url(r'^$', views.index),  #this matches the "/" pathway
+          url(r'^users$', views.show)   #this matches the "/users" pathway
+        ]
+**Go to ./apps/<app_name>/views.py
+    ****THIS IS THE CONTROLLER****
+    function names should match the names that in the <app_name>/urls.py file (one step above)
+        eg. views.index directs to a function called "def index(request):"   (as shown below)
+**********************************************************    
+****** paste all info below here over existing info ******
+**********************************************************
+	
+from django.shortcuts import render, HttpResponse, redirect
+
+def index(request):
+    context = { "somekey":"somevalue" }
+    return render(request, ‘<app_name>/index.html', context)
+
+def show(request):
+    print(request.method)
+    return render(request, ‘<app_name>/show_users.html')
+
+*********************************************************
+*********************************************************
+****The keys of the context dictionary are available to be accessed on the <page_name>.html****
+   <div class="line"><span class="text html basic"><span>{{somekey}}</span></span></div>
+
+
+** Within ./apps/<app_name>, create “templates” and “static” folders
+
+** Within ./apps/<app_name>/templates, create another folder called <app_name> which contains the appropriate files for that app
+	eg. ./apps/<app_name>/templates/<app_name>/index.html
+
+** Within ./apps/<app_name>/static, create create another folder called <app_name> which contains their appropriate files
+	eg. ./apps/<app_name>/static/<app_name>/style.css
+
+** Open ./apps/<app_name>/templates/<app_name>/index.html
+******************************************
+**** paste or type this into the body ****
+******************************************
+
+	<h1>Hello World</h1>
+
+*****************************************
+************ End paste ******************
+
+**** SAVE EVERYTHING!!!!!!!!!!
+	
+Run your python server to make sure you did everything correctly before moving on
+
+python manage.py makemigrations
+python manage.py migrate
+python manage.py runserver
+
+Got to localhost:8000 and make sure you see “Hello World”
+*** if you see “Hello World” you are ready to move on to your project ****
+
+******************
+******Notes:******
+******************
+    View (aka Controller) is views.py
+    routes is urls.py
+    views are in the templates folder
+
+** Whenever you create a form, you have to put in this token:
+    In the HTML, put this line within the <form> tags:
+        	 {% csrf_token %}
+
+** How to load static files:
+	**** In-between the HTML <head> tags **** 
+<!-- Inside apps/<app_name>/templates/<app_name>/index.html -->
+{% load staticfiles %}
+<!-- The line above tells Django to be ready to listen for static files -->
+<link rel="stylesheet" href="{% static '<app_name>/css/style.css' %}"media="screen" title="no title"  charset="utf-8">
+<script src="{% static ‘<app_name>/js/main.js' %}" > </script>
+.
